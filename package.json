@@ -1,0 +1,38 @@
+{
+  "name": "workflow-automation",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit && prettier --check .",
+    "format": "prettier --write .",
+    "test": "playwright test",
+    "verify": "npm run build && npm run check && npm test",
+    "start": "node dist/src/api.js",
+    "worker": "node dist/src/worker.js",
+    "fake-api": "node dist/src/fake-api.js"
+  },
+  "dependencies": {
+    "@fastify/multipart": "10.1.7",
+    "@fastify/static": "10.1.10",
+    "@temporalio/activity": "1.25.0",
+    "@temporalio/client": "1.25.0",
+    "@temporalio/testing": "1.25.0",
+    "@temporalio/worker": "1.25.0",
+    "@temporalio/workflow": "1.25.0",
+    "ajv": "8.20.0",
+    "fastify": "5.12.8",
+    "pg": "8.23.1",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.10.0",
+    "@types/pg": "8.15.6",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  }
+}

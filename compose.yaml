@@ -1,0 +1,82 @@
+name: workflow-automation
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: workflow_automation
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d workflow_automation"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  temporal:
+    image: temporalio/auto-setup:1.29.7
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: demo
+      POSTGRES_PWD: demo
+      POSTGRES_SEEDS: postgres
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "temporal",
+          "operator",
+          "cluster",
+          "health",
+          "--address",
+          "temporal:7233",
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+  api:
+    platform: linux/amd64
+    build: { context: ., target: app, platforms: [linux/amd64] }
+    environment: &environment
+      DATABASE_URL: postgres://demo:demo@postgres:5432/workflow_automation
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_NAMESPACE: default
+      TEMPORAL_TASK_QUEUE: workflow-automation
+      EXECUTION_MODE: ${EXECUTION_MODE:-accelerated}
+      EXTERNAL_API_URL: http://fake-api:8081
+      API_PORT: 8080
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on:
+      temporal: { condition: service_healthy }
+    init: true
+  worker:
+    platform: linux/amd64
+    build: { context: ., target: app, platforms: [linux/amd64] }
+    command: ["npm", "run", "worker"]
+    environment: *environment
+    depends_on:
+      temporal: { condition: service_healthy }
+      fake-api: { condition: service_started }
+    init: true
+  fake-api:
+    platform: linux/amd64
+    build: { context: ., target: app, platforms: [linux/amd64] }
+    command: ["npm", "run", "fake-api"]
+    init: true
+  test:
+    platform: linux/amd64
+    profiles: [test]
+    build: { context: ., target: test, platforms: [linux/amd64] }
+    environment: *environment
+    volumes:
+      - ./test-results:/app/test-results
+      - ./playwright-report:/app/playwright-report
+    depends_on:
+      temporal: { condition: service_healthy }
+    init: true
+volumes:
+  postgres:

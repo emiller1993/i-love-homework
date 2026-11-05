@@ -1,0 +1,7 @@
+/task.md
+/docs/
+/node_modules/
+/dist/
+/test-results/
+/playwright-report/
+/.superpowers/

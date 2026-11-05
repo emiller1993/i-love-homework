@@ -1,0 +1,14 @@
+schemaVersion: 1
+key: catalog
+trigger: { kind: comment, path: event.text, op: contains, value: catalog }
+guard:
+  kind: rule
+  predicate: { path: event.text, op: contains, value: stop }
+start: reply
+steps:
+  - id: reply
+    kind: reply_comment
+    text: "Catalog: https://example.com/catalog"
+    next: end
+  - id: end
+    kind: end

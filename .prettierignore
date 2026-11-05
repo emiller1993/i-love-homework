@@ -1,0 +1,8 @@
+node_modules/
+dist/
+task.md
+docs/
+.superpowers/
+test-results/
+playwright-report/
+package-lock.json

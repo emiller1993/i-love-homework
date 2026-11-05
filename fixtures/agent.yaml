@@ -1,0 +1,26 @@
+schemaVersion: 1
+key: agent
+trigger: { kind: message, path: event.text, op: contains, value: help }
+guard:
+  kind: rule
+  predicate: { path: event.text, op: equals, value: stop }
+start: prepare
+steps:
+  - id: prepare
+    kind: agent_call
+    agentVersion: assistant-v1
+    timeoutMs: 60000
+    budget: 1
+    resultSchema:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: { type: string }
+    next: send
+  - id: send
+    kind: send_message
+    text: "{{steps.prepare.text}}"
+    next: end
+  - id: end
+    kind: end

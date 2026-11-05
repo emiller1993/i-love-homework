@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Workflow automation</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <button
+          class="button close-menu"
+          id="close-menu"
+          aria-label="Close workflows"
+        >
+          ×
+        </button>
+        <a class="brand" href="/" aria-label="Workflow automation home"
+          ><span class="brand-mark">↳</span
+          ><span>Workflow<br /><strong>automation</strong></span></a
+        >
+        <div class="sidebar-heading">
+          <h2>Workflows</h2>
+          <span id="workflow-count" class="count">0</span>
+        </div>
+        <p class="sidebar-hint">Choose what to test in your next sandbox.</p>
+        <label class="search"
+          ><span class="sr-only">Search workflows</span
+          ><input id="search" type="search" placeholder="Search workflows…"
+        /></label>
+        <div id="workflow-list" class="workflow-list"></div>
+        <details class="upload-panel" open>
+          <summary>Upload a workflow</summary>
+          <p>Have an agent prepare a JSON or YAML file, then load it here.</p>
+          <label class="file-field"
+            >Workflow file<input
+              id="workflow-file"
+              type="file"
+              accept=".json,.yaml,.yml"
+          /></label>
+          <button class="button sidebar-button" id="upload" data-action>
+            Upload workflow
+          </button>
+        </details>
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>
+          <div>
+            Local demo<small>Agents and outgoing messages are simulated.</small>
+          </div>
+        </div>
+      </aside>
+      <main>
+        <header class="topbar">
+          <button
+            class="button menu-button"
+            id="menu"
+            aria-label="Workflows"
+            aria-expanded="false"
+            aria-controls="sidebar"
+          >
+            ☰ Workflows
+          </button>
+          <div class="breadcrumb">
+            Workspace <span>/</span>
+            <strong id="workspace-name">Conversation</strong>
+          </div>
+          <nav class="view-tabs" aria-label="Workspace views">
+            <button
+              id="conversation-tab"
+              class="view-tab active"
+              aria-pressed="true"
+            >
+              Conversation
+            </button>
+            <button id="backtest-tab" class="view-tab" aria-pressed="false">
+              Backtest
+            </button>
+          </nav>
+          <button class="button primary" id="new-sandbox" data-action>
+            <span aria-hidden="true">＋</span> New sandbox
+          </button>
+        </header>
+        <div class="main-content">
+          <div id="status" role="status" aria-live="polite" class="notice">
+            Loading your workflows…
+          </div>
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow">YOUR AUTOMATION, EXPLAINED</p>
+              <h1 id="page-title">See your workflow in action.</h1>
+              <p id="page-description">
+                Follow the steps, act as a contact, and see exactly what
+                happens.
+              </p>
+            </div>
+            <span class="badge simulated"
+              ><span class="status-dot"></span> Simulated messages</span
+            >
+          </section>
+          <ol class="setup-progress" aria-label="Getting started">
+            <li id="progress-workflow">
+              <span>1</span>
+              <div>
+                Choose a workflow<small id="progress-workflow-text"
+                  >Upload or select a saved version</small
+                >
+              </div>
+            </li>
+            <li id="progress-sandbox">
+              <span>2</span>
+              <div>
+                New sandbox<small id="progress-sandbox-text"
+                  >Create an isolated test conversation</small
+                >
+              </div>
+            </li>
+            <li id="progress-conversation">
+              <span>3</span>
+              <div>
+                Try a conversation<small
+                  >Send a comment or a private message</small
+                >
+              </div>
+            </li>
+          </ol>
+          <section id="conversation-view">
+            <div id="next-action" class="next-action">
+              <span class="next-icon" aria-hidden="true">→</span>
+              <div>
+                <strong>Start with a workflow</strong>
+                <p>
+                  Choose a saved version on the left, or upload your workflow
+                  file.
+                </p>
+              </div>
+            </div>
+            <div class="workspace">
+              <section
+                class="panel workflow-panel"
+                aria-label="Workflow visualization"
+              >
+                <header class="panel-heading">
+                  <div>
+                    <span class="eyebrow">WORKFLOW</span>
+                    <h2 id="workflow-title">No workflow selected</h2>
+                  </div>
+                  <div class="panel-heading-actions">
+                    <span class="badge neutral">Read only</span>
+                    <button
+                      class="button secondary export-button"
+                      id="export-workflow"
+                      data-action
+                    >
+                      Export workflow
+                    </button>
+                  </div>
+                </header>
+                <label class="workflow-select"
+                  >Viewing
+                  <select id="workflows" aria-label="Workflow version"></select
+                ></label>
+                <div class="flow-viewport">
+                  <div id="steps" aria-label="Workflow steps"></div>
+                </div>
+                <details class="panel-details">
+                  <summary>
+                    Enabled workflows in this sandbox
+                    <span id="enabled-count"></span>
+                  </summary>
+                  <p>
+                    Changing this list affects future triggers. Running
+                    conversations keep their version.
+                  </p>
+                  <div id="enabled" class="enabled-list"></div>
+                </details>
+              </section>
+              <section
+                class="panel conversation-panel"
+                aria-label="Test conversation"
+              >
+                <header class="panel-heading">
+                  <div class="contact-heading">
+                    <span class="avatar" aria-hidden="true">C</span>
+                    <div>
+                      <label class="contact-label"
+                        >Contact<input id="contact" value="contact" /></label
+                      ><small>You are playing this contact.</small>
+                    </div>
+                  </div>
+                  <div class="panel-heading-actions conversation-controls">
+                    <button
+                      class="button secondary export-button"
+                      id="export-conversation"
+                      data-action
+                    >
+                      Export conversation
+                    </button>
+                    <button class="button stop-button" id="stop" data-action>
+                      Stop conversation
+                    </button>
+                    <button
+                      class="button secondary"
+                      id="restart"
+                      data-action
+                      hidden
+                    >
+                      Restart conversation
+                    </button>
+                  </div>
+                </header>
+                <div id="runs" class="run-summary"></div>
+                <ol
+                  id="transcript"
+                  class="transcript"
+                  aria-label="Conversation messages"
+                >
+                  <li class="empty-chat">
+                    <span aria-hidden="true">◌</span
+                    ><strong>Your conversation starts here</strong>
+                    <p>
+                      Send the trigger shown in the workflow. Outgoing replies
+                      will appear here.
+                    </p>
+                  </li>
+                </ol>
+                <div id="invocations" class="invocations"></div>
+                <div class="composer">
+                  <label for="text"
+                    >Text
+                    <span aria-hidden="true">Write as the contact</span></label
+                  ><textarea
+                    id="text"
+                    aria-label="Text"
+                    rows="2"
+                    placeholder="Write a comment or a private message…"
+                  ></textarea>
+                  <div class="composer-footer">
+                    <small id="composer-hint"
+                      >Create a sandbox to send your first message.</small
+                    >
+                    <div>
+                      <button class="button secondary" id="comment" data-action>
+                        Comment</button
+                      ><button class="button primary" id="message" data-action>
+                        Message
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <section class="time-panel" aria-label="Sandbox clock">
+                  <div class="clock-icon" aria-hidden="true">◷</div>
+                  <div class="clock-copy">
+                    <strong>Control the waiting</strong>
+                    <p id="clock-hint">
+                      Skip a quiet window or a long wait without waiting in real
+                      time.
+                    </p>
+                    <small id="sandbox">No sandbox yet</small>
+                  </div>
+                  <div class="clock-controls">
+                    <label
+                      >Seconds<input
+                        id="seconds"
+                        type="number"
+                        min="0"
+                        max="86400"
+                        value="3.1"
+                        step="0.1" /></label
+                    ><button class="button secondary" id="advance" data-action>
+                      Advance time
+                    </button>
+                  </div>
+                </section>
+              </section>
+            </div>
+            <details class="diagnostics">
+              <summary>
+                Trace &amp; technical details
+                <span>Inspect execution, actions, and raw data</span>
+              </summary>
+              <div class="diagnostics-grid">
+                <section>
+                  <h3>Actions</h3>
+                  <ul id="actions"></ul>
+                </section>
+                <section>
+                  <h3>Trace</h3>
+                  <ol id="trace"></ol>
+                </section>
+              </div>
+              <details>
+                <summary>Raw snapshot</summary>
+                <pre id="snapshot-json"></pre>
+              </details>
+            </details>
+          </section>
+          <section id="backtest-view" hidden>
+            <div class="backtest-grid">
+              <section class="panel backtest-setup">
+                <header class="panel-heading">
+                  <div>
+                    <span class="eyebrow">REPLAY A CONVERSATION</span>
+                    <h2>Try a whole history.</h2>
+                  </div>
+                  <span class="badge neutral">Isolated run</span>
+                </header>
+                <p>
+                  Upload a timeline of comments, messages, and agent responses.
+                  See how your selected workflows would handle it.
+                </p>
+                <label class="file-field"
+                  >Backtest file<input
+                    id="backtest-file"
+                    type="file"
+                    accept=".json"
+                /></label>
+                <p class="field-help">
+                  Runs use the workflows selected on the left. To reuse recorded
+                  agent responses, choose versions of the same workflows.
+                </p>
+                <div id="backtest-preview"></div>
+                <button class="button primary" id="backtest" data-action>
+                  Run backtest
+                </button>
+                <p class="field-help">
+                  This uses a fresh sandbox and saves the report. Your current
+                  conversation stays separate.
+                </p>
+              </section>
+              <section
+                id="report"
+                class="panel report-panel"
+                aria-label="Backtest report"
+              >
+                <div class="empty-report">
+                  <span aria-hidden="true">↺</span>
+                  <h2>See what your workflow would do.</h2>
+                  <p>
+                    Run a backtest to see delivered messages, completed
+                    conversations, and anything still waiting.
+                  </p>
+                </div>
+              </section>
+            </div>
+            <section
+              id="report-messages"
+              class="panel report-messages"
+              hidden
+            ></section>
+            <details class="diagnostics">
+              <summary>
+                Backtest trace <span>Step-by-step execution</span>
+              </summary>
+              <ol id="report-trace"></ol>
+            </details>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

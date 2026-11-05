@@ -1,0 +1,40 @@
+{
+  "workflowVersionIds": [],
+  "until": 12000,
+  "timeline": [
+    {
+      "at": 0,
+      "kind": "event",
+      "event": {
+        "eventId": "comment-1",
+        "commentId": "original-comment",
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "kind": "comment",
+        "text": "pricing"
+      }
+    },
+    {
+      "at": 4000,
+      "kind": "event",
+      "event": {
+        "eventId": "invalid-email",
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "kind": "message",
+        "text": "hello"
+      }
+    },
+    {
+      "at": 8000,
+      "kind": "event",
+      "event": {
+        "eventId": "valid-email",
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "kind": "message",
+        "text": "person@example.com"
+      }
+    }
+  ]
+}

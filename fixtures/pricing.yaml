@@ -1,0 +1,25 @@
+schemaVersion: 1
+key: pricing
+trigger: { kind: comment, path: event.text, op: contains, value: pricing }
+start: reply
+steps:
+  - id: reply
+    kind: reply_comment
+    text: "Thanks! Check your messages."
+    next: ask
+  - id: ask
+    kind: send_message
+    text: "What is your email?"
+    next: email
+  - id: email
+    kind: wait_message
+    accept: { path: event.text, op: is_email }
+    timeoutMs: 60000
+    next: link
+    onTimeout: end
+  - id: link
+    kind: send_message
+    text: "Pricing for {{steps.email.text}}: https://example.com/pricing"
+    next: end
+  - id: end
+    kind: end

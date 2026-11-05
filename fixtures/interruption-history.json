@@ -1,0 +1,56 @@
+{
+  "workflowVersionIds": [],
+  "until": 12000,
+  "timeline": [
+    {
+      "at": 0,
+      "kind": "event",
+      "event": {
+        "eventId": "help-1",
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "kind": "message",
+        "text": "help with pricing"
+      }
+    },
+    {
+      "at": 4000,
+      "kind": "event",
+      "event": {
+        "eventId": "detail-1",
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "kind": "message",
+        "text": "also explain delivery"
+      }
+    },
+    {
+      "at": 8000,
+      "kind": "completion",
+      "target": {
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "triggerEventId": "help-1",
+        "workflowVersionId": "",
+        "callKind": "agent",
+        "stepId": "prepare",
+        "attempt": 1
+      },
+      "completion": { "result": { "text": "Obsolete response" } }
+    },
+    {
+      "at": 8000,
+      "kind": "completion",
+      "target": {
+        "accountId": "demo-account",
+        "contactId": "contact",
+        "triggerEventId": "help-1",
+        "workflowVersionId": "",
+        "callKind": "agent",
+        "stepId": "prepare",
+        "attempt": 2
+      },
+      "completion": { "result": { "text": "Pricing and delivery explained" } }
+    }
+  ]
+}
